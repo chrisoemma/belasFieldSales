@@ -1,0 +1,21 @@
+export default {
+    home: 'Nyumbani',
+    requests:'Maombi',
+    account:'Akaunti',
+    settings: 'Mipangilio',
+    whatsapp: 'WhatsApp',
+    support: 'Msaada',
+    language: 'Lugha',
+    business:'Biashara yangu',
+    logout: 'Toka',
+    punchInOut:'Kuingia/Kutoka',
+    dashboard: "Dashibodi",
+    clients: "Wateja",
+    liveTracking: "Ufuatiliaji wa Moja kwa Moja",
+    checkIns: "Uchunguzi",
+    reports: "Ripoti",
+    tasks:'Kazi',
+    active: "Aktivu",
+    past: "Zamani",
+    liveLocation: 'Mahali Halisi'
+  };

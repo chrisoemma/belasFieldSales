@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "75332193487",
+    "project_id": "belasfs-a09b5",
+    "storage_bucket": "belasfs-a09b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75332193487:android:e3f4e596e9c00ca265bbba",
+        "android_client_info": {
+          "package_name": "com.belasfs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2entzMs8eadPF37IxhSVk2B_X8biHxc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
