@@ -2,7 +2,6 @@ import React from 'react';
 import { Image, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-//import BottomTabNavigator from './BottomTabNavigator';
 import { globalStyles } from '../styles/global';
 import CustomDrawerContent from './CustomDrawerContent';
 import Home from '../features/home/Home';

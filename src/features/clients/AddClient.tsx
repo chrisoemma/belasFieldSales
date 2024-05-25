@@ -66,9 +66,6 @@ const {
   const {user } = useSelector(
     (state: RootStateOrAny) => state.user,
   );
-    const { salesPeople } = useSelector(
-      (state: RootStateOrAny) => state.salesPeople,
-  );
 
   useEffect(() => {
     dispatch(getSalesPeople({ companyId:user?.company_id,userId: user?.id}));
@@ -90,17 +87,12 @@ const {
     }, 5000);
   };
 
-
-  
-
   const onSubmit = (data) => { 
-   
-
     data.latitude=location.lat
     data.longitude=location.lng
+    data.company_id=user.company_id;
     
     if (isEditMode) {
-
       dispatch(updateClient({data:data,clientId:client?.id}))
       .unwrap()
       .then(result => {
@@ -123,7 +115,7 @@ const {
         console.log(rejectedValueOrSerializedError);
       });
     } else {
-        dispatch(createClient({data:data,companyId:user.company_id}))
+        dispatch(createClient({data:data}))
         .unwrap()
         .then(result => {
           if (result.status) {
@@ -155,9 +147,9 @@ const {
     >
       <View style={styles.container}>
 
-      <BasicView style={stylesGlobal.centerView}>
-              <Text style={stylesGlobal.errorMessage}>{message}</Text>
-      </BasicView>
+       {message ? (<BasicView style={stylesGlobal.centerView}>
+          <Text style={stylesGlobal.errorMessage}>{message}</Text>
+        </BasicView>) : (<View />)}
 
         <View>
           <BasicView>

@@ -61,16 +61,6 @@ export const formatNumber = (number, decPlaces, decSep, thouSep) => {
   );
 };
 
-export const transformDataToDropdownOptions=(data:any)=> {
-  if (!data || !Array.isArray(data)) {
-    return [];
-  }
-
-  return data.map(item => ({
-    label: item.name,
-    value: item.id.toString(),
-  }));
-}
 
 
 export const formatCheckinTime = (originalCheckinTime) => {
@@ -190,6 +180,18 @@ export const pickerDuration = (n)=>{
 }
 
 
+export const transformDataToDropdownOptions=(data:any)=> {
+  if (!data || !Array.isArray(data)) {
+    return [];
+  }
+
+  return data.map(item => ({
+    label: item.name,
+    value: item.id.toString(),
+  }));
+}
+
+
 
 export const getLocationName = async (latitude, longitude) => {
   try {
@@ -202,7 +204,6 @@ export const getLocationName = async (latitude, longitude) => {
     }
 
     const data = await response.json();
-    console.log('dataaaaMap',data);
     if (data.results.length > 0) {
       const addressComponents = data.results[0].address_components;
 

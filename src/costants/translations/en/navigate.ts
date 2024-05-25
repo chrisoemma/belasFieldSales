@@ -13,11 +13,13 @@ export default {
     liveTracking:'Live Tracking',
     checkIns:'Check-Ins/out',
     reports:'Reports',
+    leads:'Leads',
     tasks:'Tasks',
     active:'Active',
     past:'Past',
     liveLocation:'Live Location',
-    checkIn:'Check-ins'
+    checkIn:'Check-ins',
+    addContactPerson:'Add contact Person'
 
    
 

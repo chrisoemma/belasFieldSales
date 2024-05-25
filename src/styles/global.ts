@@ -243,11 +243,11 @@ const globalStyles = () => {
       fontSize: 16,
     },
     circle: {
-      width: 100,
-      height: 100,
-      borderRadius: 100,
+
+      width: 105,
+      height: 105,
+      borderRadius: 105,
       backgroundColor: '#F7F6FF',
-      alignSelf: 'center',
     },
     chooseServiceBtn: {
       marginVertical: 5,

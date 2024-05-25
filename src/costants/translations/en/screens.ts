@@ -120,5 +120,21 @@ export default {
   totalDurationAllPunches:'Total Duration for All Punches',
   totalDuration:'Total Duration',
   punchInLocation:'Punch In Location',
-  punchOutLocation:'Punch Out Location'
+  punchOutLocation:'Punch Out Location',
+
+  email:'Email',
+  phone:'Phone',
+  sendMessage:'Send Message',
+  address:'Address',
+  noLocationFound:'No location Found',
+  profile:'Profile',
+  contacts:'Contacts',
+  unknownPosition:'Unknown Position',
+  selectPositions:'Select Positions',
+  addContactPerson:'Add contact Person',
+  updateContactPerson:'Update contact Person',
+  editContactPerson:'Edit contact person',
+  deleteContactPerson:'Delete contact person',
+  deletedSuccessfully:'Deleted Successfully'
+  
 };

@@ -7,6 +7,7 @@ export default {
     support: 'Msaada',
     language: 'Lugha',
     business:'Biashara yangu',
+    leads:'Makala',
     logout: 'Toka',
     punchInOut:'Kuingia/Kutoka',
     dashboard: "Dashibodi",
@@ -17,5 +18,6 @@ export default {
     tasks:'Kazi',
     active: "Aktivu",
     past: "Zamani",
-    liveLocation: 'Mahali Halisi'
+    liveLocation: 'Mahali Halisi',
+    addContactPerson:'Ongeza contact person'
   };

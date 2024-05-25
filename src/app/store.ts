@@ -24,6 +24,7 @@ import OnboardingSlice from '../features/onboarding/OnboardingSlice';
 import checkInSlice from '../features/checkInsOut/checkInSlice';
 import InternetSlice from '../features/InternetSlice';
 import PunchRecordSlice from '../features/punchInOut/PunchRecordSlice';
+import ContactPeopleSlice from '../features/contacts/ContactPeopleSlice';
 
 
 const reducers = combineReducers({
@@ -38,7 +39,8 @@ const reducers = combineReducers({
   onboarding:OnboardingSlice,
   checkIns:checkInSlice,
   internet:InternetSlice,
-  PunchRecords:PunchRecordSlice
+  PunchRecords:PunchRecordSlice,
+  contactPeople:ContactPeopleSlice
 
 });
 

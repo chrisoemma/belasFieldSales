@@ -117,7 +117,20 @@ export default {
   totalDurationAllPunches:'Jumla mda kwa zote',
   totalDuration:'Jumla Mda',
   punchInLocation:'Mahali pa Kuingia',
-  punchOutLocation:'Mahali pa kutokea'
+  punchOutLocation:'Mahali pa kutokea',
+  email:'Barua pepe',
+  phone:'Namba',
+  sendMessage:'Tuma ujumbe',
+  address:'Eneo',
+  noLocationFound:'Hakuna eneo lililopatikana',
+  profile:'Wasifu',
+  contacts:'Mawasiliano',
+  selectPositions:'Chagua Cheo',
+  addContactPerson:'Ongeza wa kuwasiliana',
+  updateContactPerson:'Sahihisha  wa kuwasiliana',
+  editContactPerson:'Sahihisha wa kuwasiliana',
+  deleteContactPerson:'Futa wa kuwasiliana',
+  deletedSuccessfully:'Imefutwa kimamilifu'
 
 
 };

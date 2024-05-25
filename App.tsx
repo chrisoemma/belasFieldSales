@@ -5,7 +5,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { persistStore } from 'redux-persist';
 import Navigation from './src/navigation';
 import store from './src/app/store';
-import { MenuProvider } from 'react-native-popup-menu'; 
+import { MenuProvider } from 'react-native-popup-menu';
 
 
 
@@ -15,17 +15,17 @@ const App = () => {
 
 
   return (
-    
+
     <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      
-       <MenuProvider>
-        <Navigation />
-       </MenuProvider>
-    </PersistGate>
-  </Provider>
-     
-  
+      <PersistGate loading={null} persistor={persistor}>
+
+        <MenuProvider>
+          <Navigation />
+        </MenuProvider>
+      </PersistGate>
+    </Provider>
+
+
   );
 };
 

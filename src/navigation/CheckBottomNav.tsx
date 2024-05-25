@@ -7,8 +7,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from '../features/home/Home';
 import { colors } from '../utils/colors';
 import { useTranslation } from 'react-i18next';
-// import CategoryScreen from '../features/category/CategoryScreen';
-// import Requests from '../features/requests/Requests';
 import Account from '../features/account/Account';
 import ActiveCheckIns from '../features/checkInsOut/ActiveCheckIns';
 import checkOuts from '../features/checkInsOut/CheckOuts';

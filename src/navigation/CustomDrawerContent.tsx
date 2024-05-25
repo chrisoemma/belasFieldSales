@@ -9,10 +9,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useTranslation } from 'react-i18next';
 import { userLogout } from './../features/auth/userSlice';
 
-//import { globalStyles } from '../style/global';
 import { colors } from '../utils/colors';
 import { useDispatch, useSelector, RootStateOrAny } from 'react-redux';
-//import { services } from '../utils/app-services';
 
 const DrawerHeader = styled.View`
   height: 150px;
@@ -64,16 +62,27 @@ const CustomDrawerContent = (props: any) => {
         },
       },
       {
+        name: 'LiveLocation',
+        icon: 'map-pin',
+        language:'liveLocation',
+        screen: 'Live Location',
+      },
+      {
         name: 'punchInOut',
         icon: 'map-pin',
         language:'punchInOut',
         screen: 'punchInOut',
       },
       {
-        name: 'LiveLocation',
-        icon: 'map-pin',
-        language:'liveLocation',
-        screen: 'Live Location',
+        name: 'Check-Ins/Check-outs',
+        icon: 'phone',
+        language:'checkIns',
+        screen: 'Check-in/out',
+      },
+      {
+        name: 'Live Tracking',
+        icon: 'whatsapp',
+        language:'liveTracking',
       },
       {
         name: 'Clients',
@@ -87,17 +96,20 @@ const CustomDrawerContent = (props: any) => {
         language:'tasks',
         screen: 'Tasks',
       },
+
       {
-        name: 'Live Tracking',
-        icon: 'whatsapp',
-        language:'liveTracking',
+        name: 'Leads',
+        icon: 'cogs',
+        language:'leads',
+        screen: 'Leads',
       },
       {
-        name: 'Check-Ins/Check-outs',
-        icon: 'phone',
-        language:'checkIns',
-        screen: 'Check-in/out',
+        name: 'Opportunities',
+        icon: 'cogs',
+        language:'opportunities',
+        screen: 'Opportunities',
       },
+
       {
         name: 'Settings',
         icon: 'cogs',
