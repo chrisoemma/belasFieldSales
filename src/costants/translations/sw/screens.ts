@@ -130,7 +130,12 @@ export default {
   updateContactPerson:'Sahihisha  wa kuwasiliana',
   editContactPerson:'Sahihisha wa kuwasiliana',
   deleteContactPerson:'Futa wa kuwasiliana',
-  deletedSuccessfully:'Imefutwa kimamilifu'
+  deletedSuccessfully:'Imefutwa kimamilifu',
+  deleteOpportunity:'Futa Fursa',
+  addAccount:'Ongeza Akaunti',
+  account:'Akaunti',
+  selectAccount:'Chagua Akaunti'
+
 
 
 };

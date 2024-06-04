@@ -22,6 +22,8 @@ export default {
     addContactPerson:'Ongeza contact person',
     leadDetail:'Maelezo ya mwongozo',
     addLead:'Ongeza mwongozo',
-    oppoturnities:'Nafasi zenye uwezekano',
-    opportunityDetail:'Maelezo zaidi ya nafasi'
+    oppoturnities:'Fursa zenye uwezekano',
+    opportunityDetail:'Maelezo zaidi ya fursa',
+    addOpportunity:'Ongeza Fursa'
+    
   };

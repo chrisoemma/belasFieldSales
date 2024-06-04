@@ -23,6 +23,7 @@ import LeadDetail from "../features/leads/LeadDetail";
 import AddLead from "../features/leads/AddLead";
 import Opportunities from "../features/opportunity/Oppoturnities";
 import OpportunityDetail from "../features/opportunity/OpportunityDetail";
+import AddOpportunity from "../features/opportunity/AddOpportunity";
 
 const AppStack = () => {
   const { t } = useTranslation();
@@ -52,6 +53,7 @@ const AppStack = () => {
       <Stack.Screen name="LeadDetail" component={LeadDetail}  options={{ title: t('navigate:leadDetail') }} />
       <Stack.Screen name="OpportunityDetail" component={OpportunityDetail}  options={{ title: t('navigate:opportunityDetail') }} />
       <Stack.Screen name="AddLead" component={AddLead}  options={{ title: t('navigate:addLead') }} />
+      <Stack.Screen name="AddOpportunity" component={AddOpportunity}  options={{ title: t('navigate:addOpportunity') }} />
       <Stack.Screen name="Opportunities" component={Opportunities} options={{ title: t('navigate:Opportunities') }} />
     </Stack.Navigator>
   );

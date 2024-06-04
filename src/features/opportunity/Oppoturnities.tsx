@@ -88,8 +88,8 @@ const Opportunities = ({ navigation }: any) => {
             {/* <Text style={styles.detail}>📊 Forecast: {item.forecast.name}</Text> */}
             <View>
                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                    <View style={[styles.statusContainer, { backgroundColor: getStatusColor(item.opportunity_stages[0]?.stage) }]}>
-                        <Text style={styles.statusText}>{item.opportunity_stages[0]?.stage}</Text>
+                    <View style={[styles.statusContainer, { backgroundColor: getStatusColor(item?.opportunity_stages[item?.opportunity_stages?.length - 1]?.stage) }]}>
+                        <Text style={styles.statusText}>{item?.opportunity_stages[item?.opportunity_stages?.length - 1]?.stage}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                         <Text style={styles.ownerName}> 👤 {item?.owner?.name}</Text>
@@ -138,7 +138,7 @@ const Opportunities = ({ navigation }: any) => {
                 />
             </View>
             <FloatButton
-                onPress={() => navigation.navigate('AddLead')}
+                onPress={() => navigation.navigate('AddOpportunity')}
                 iconType="add"
             />
         </View>

@@ -135,6 +135,10 @@ export default {
   updateContactPerson:'Update contact Person',
   editContactPerson:'Edit contact person',
   deleteContactPerson:'Delete contact person',
-  deletedSuccessfully:'Deleted Successfully'
+  deletedSuccessfully:'Deleted Successfully',
+  deleteOpportunity:'Delete Opportunity',
+  addAccount:'Add Account',
+  account:'Account',
+  selectAccount:'Select Account'
   
 };

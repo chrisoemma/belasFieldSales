@@ -23,6 +23,7 @@ export default {
     leadDetail:'Lead Detail',
     addLead:'Add Lead',
     oppoturnities:'Opportunities',
-    opportunityDetail:'Opportunity Detail'
+    opportunityDetail:'Opportunity Detail',
+    addOpportunity:'Add Opportunity'
 
   };

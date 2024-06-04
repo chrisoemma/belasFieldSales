@@ -419,6 +419,7 @@ useEffect(() => {
                 <DropDownPicker
                   open={clientOpen}
                   zIndex={6000}
+                  searchable={true}
                   placeholder={t('screens:selectClients')}
                   listMode='SCROLLVIEW'
                   value={clientValue}

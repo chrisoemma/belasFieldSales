@@ -34,9 +34,6 @@ const ForecastCategorySlice = createSlice({
             state.loading = true;
         });
         builder.addCase(getForecastCategories.fulfilled, (state, action) => {
-            console.log('Fulfilled case');
-            console.log(action.payload);
-
             if (action.payload.status) {
                 state.forecastCategories = action.payload.data.forecasts;
             }

@@ -1,35 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ToastAndroid, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ToastAndroid, Modal, useWindowDimensions, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
-// import { updateLeadStatus, updateLeadDetails } from './LeadSlice';
+import DatePicker from 'react-native-date-picker';
 import { colors } from '../../utils/colors';
 import { TextInputField } from '../../components/TextInputField';
 import { globalStyles } from '../../styles/global';
-import { formatDateToYYYYMMDD, transformDataToDropdownOptions, transformDataToDropdownOptionsLead } from '../../utils/utilts';
+import { formatDateToYYYYMMDD, formatDateToYYYYMMDDHHMM, formatNumber, transformDataToDropdownOptions, transformDataToDropdownOptionsLead } from '../../utils/utilts';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { getIndustries } from '../IndustryPositionSlice';
 import { getOpportunityStages } from './OppoturnitySlice';
 import { getForecastCategories } from '../forecastCategory/forecastCategorySlice';
+import { TextAreaInputField } from '../../components/TextAreaInputField';
+import { useTranslation } from 'react-i18next';
 
-const  OpportunityDetail = ({ route, navigation }) => {
+const OpportunityDetail = ({ route, navigation }) => {
     const { opportunity } = route.params;
     const dispatch = useDispatch();
 
-    const { OpportunityStages } = useSelector((state: RootStateOrAny) => state.Opportunities);
-    const { forecastCategories } = useSelector((state: RootStateOrAny) => state.forecastCategories);
-    const { user } = useSelector((state: RootStateOrAny) => state.user);
-
-
+    const { OpportunityStages } = useSelector((state) => state.Opportunities);
+    const { forecastCategories } = useSelector((state) => state.forecastCategories);
+    const { user } = useSelector((state) => state.user);
     const { control, handleSubmit, setValue } = useForm({
         defaultValues: {
             name: opportunity?.name || '',
             client_name: opportunity?.client?.name || '',
             description: opportunity.description || '',
-            probability: opportunity?.opportunity_stages[opportunity?.opportunity_stages?.length-1]?.probability || '',
-            industry: opportunity?.industry || '',
+            probability: opportunity?.opportunity_stages[opportunity?.opportunity_stages?.length - 1]?.probability || '',
             amount: opportunity?.amount || '',
+            close_date: opportunity?.close_date ? new Date(opportunity.close_date) : new Date(),
         },
     });
 
@@ -54,24 +54,30 @@ const  OpportunityDetail = ({ route, navigation }) => {
     }, [forecastCategories]);
 
     useEffect(() => {
+        setForecastCategoryValue(JSON.stringify(opportunity?.forecast.id));
+    }, [opportunity?.forecast.id]);
+
+    useEffect(() => {
         Object.keys(opportunity).forEach((key) => {
             if (opportunity[key] !== null) setValue(key, opportunity[key]);
         });
     }, [opportunity, setValue]);
 
-    const [status, setStatus] = useState(opportunity.opportunity_stages?.stage);
+    const [status, setStatus] = useState(opportunity?.opportunity_stages[opportunity?.opportunity_stages?.length - 1]?.stage);
     const [modalVisible, setModalVisible] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
+    const { height } = useWindowDimensions();
+    const { t } = useTranslation();
 
     const handleStatusChange = (newStatus) => {
         setStatus(newStatus);
-        //dispatch(updateopportunityStatus({ opportunityId: opportunity.id, status: newStatus }));
+        // dispatch(updateOpportunityStatus({ opportunityId: opportunity.id, status: newStatus }));
     };
 
     const onSubmit = (data) => {
-        const updatedopportunity = { ...opportunity, ...data };
-      //  dispatch(updateopportunityDetails(updatedopportunity));
-        ToastAndroid.show('opportunity details updated successfully', ToastAndroid.SHORT);
+        const updatedOpportunity = { ...opportunity, ...data };
+        // dispatch(updateOpportunityDetails(updatedOpportunity));
+        ToastAndroid.show('Opportunity details updated successfully', ToastAndroid.SHORT);
         setModalVisible(false);
         navigation.goBack();
     };
@@ -82,13 +88,15 @@ const  OpportunityDetail = ({ route, navigation }) => {
 
     const stylesGlobal = globalStyles();
 
-    const [forecastCategorySourceOpen, setForecastCategoryOpen] = useState(false);
-    const [forecastCategorySourceValue, setForecastCategoryValue] = useState(opportunity.foreastCategory_source || null);
+    const [forecastCategoryOpen, setForecastCategoryOpen] = useState(false);
+    const [forecastCategoryValue, setForecastCategoryValue] = useState(opportunity.forecast?.id || null);
     const [foreastCategorySourceItems, setForecastCategoryItems] = useState([]);
 
     const [oppoturnityStageOpen, setOppoturnityStageOpen] = useState(false);
     const [oppoturnityStageValue, setOppoturnityStageValue] = useState(opportunity.oppoturnityStage || null);
     const [oppoturnityStageItems, setOppoturnityStageItems] = useState([]);
+
+    const [datePickerOpen, setDatePickerOpen] = useState(false);
 
     const steps = [
         {
@@ -96,23 +104,60 @@ const  OpportunityDetail = ({ route, navigation }) => {
             fields: [
                 { name: "name", label: "Opportunity name", placeholder: "Enter Opportunity name", required: true },
                 { name: "client_name", label: "Account", placeholder: "Enter Account Name", required: true },
-                { name: "close_date", label: "Close Date", placeholder: "Close Date" },
+                { name: "close_date", label: "Close Date", placeholder: "Close Date", type: "date" },
                 { name: "description", label: "Description", placeholder: "Enter Description" },
                 { name: "amount", label: "Amount", placeholder: "Enter Amount" },
-            ]
+            ],
         },
-  
         {
             title: "Status",
             fields: [
-                
-                { name: "Stage", label: "Select Stage", type: "dropdown", items: oppoturnityStageItems, open: oppoturnityStageOpen, value: oppoturnityStageValue, setOpen: setOppoturnityStageOpen, setValue: setOppoturnityStageValue, setItems: setOppoturnityStageItems, zIndex: 10000, placeholder: "Opportunity stage" },
-                { name: "forecast Category", label: "Forecast Category", type: "dropdown", items: foreastCategorySourceItems, open: forecastCategorySourceOpen, value: forecastCategorySourceValue, setOpen: setForecastCategoryOpen, setValue: setForecastCategoryValue, setItems: setForecastCategoryItems, zIndex: 9000, placeholder: "Forecast Category" },
+                // { name: "Stage", label: "Select Stage", type: "dropdown", items: oppoturnityStageItems, open: oppoturnityStageOpen, value: oppoturnityStageValue, setOpen: setOppoturnityStageOpen, setValue: setOppoturnityStageValue, setItems: setOppoturnityStageItems, zIndex: 10000, placeholder: "Opportunity stage" },
+                { name: "forecast Category", label: "Forecast Category", type: "dropdown", items: foreastCategorySourceItems, open: forecastCategoryOpen, value: forecastCategoryValue, setOpen: setForecastCategoryOpen, setValue: setForecastCategoryValue, setItems: setForecastCategoryItems, zIndex: 9000, placeholder: "Forecast Category" },
                 { name: "probability", label: "Probability", placeholder: "Enter Probability %" },
-               
-            ]
+            ],
         },
     ];
+
+
+
+
+    const deleteFunc = (id) =>
+        Alert.alert(`${t('screens:deleteOpportunity')}`, `${t('screens:areYouSureDelete')}`, [
+          {
+            text: `${t('screens:cancel')}`,
+            onPress: () => console.log('Cancel client delete'),
+            style: 'cancel',
+          },
+          {
+            text: `${t('screens:ok')}`,
+            onPress: () => {
+      
+            //   dispatch(deleteOpportunity({ opportunityId: id }))
+            //     .unwrap()
+            //     .then(result => {
+            //       if (result.status) {
+            //         ToastAndroid.show(`${t('screens:deletedSuccessfully')}`, ToastAndroid.SHORT);
+            //         navigation.navigate('Clients', {
+            //           screen: 'Clients',
+            //         });
+            //       } else {
+            //         setDisappearMessage(
+            //           `${t('screens:requestFail')}`,
+            //         );
+            //         console.log('dont navigate');
+            //       }
+    
+            //       console.log('resultsss', result)
+            //     })
+            //     .catch(rejectedValueOrSerializedError => {
+            //       // handle error here
+            //       console.log('error');
+            //       console.log(rejectedValueOrSerializedError);
+            //     });
+            },
+          },
+        ]);
 
     const renderStepFields = (step) => {
         return step.fields.map((field) => {
@@ -134,16 +179,73 @@ const  OpportunityDetail = ({ route, navigation }) => {
                                 }}
                                 setItems={field.setItems}
                                 placeholder={field.placeholder}
+                                defaultValue={forecastCategoryValue}
                                 onChangeValue={onChange}
                                 zIndex={field.zIndex}
                                 containerStyle={{
                                     marginBottom: 15,
-                                    zIndex: field.zIndex, 
-                                    elevation:10 
+                                    zIndex: field.zIndex,
+                                    elevation: 10,
+                                    height: Math.min(height * 0.3, step.fields.length * 100),
                                 }}
                             />
                         )}
                         name={field.name}
+                    />
+                );
+            } else if (field.type === "date") {
+                return (
+                    <Controller
+                        key={field.name}
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                            <View>
+                                <TouchableOpacity onPress={() => setDatePickerOpen(true)}>
+                                    <TextInputField
+                                        label={field.label}
+                                        placeholder={field.placeholder}
+                                        value={formatDateToYYYYMMDDHHMM(value)}
+                                        editable={false}
+                                        style={styles.inputField}
+                                    />
+                                </TouchableOpacity>
+
+                                <DatePicker
+                                    modal
+                                    open={datePickerOpen}
+                                    date={new Date(value) || new Date()}
+                                    mode={"datetime"}
+                                    minimumDate={new Date()}
+                                    onConfirm={(date) => {
+                                        setDatePickerOpen(false);
+                                        console.log('Selected Date:', date); // Debugging log
+                                        onChange(date);
+                                    }}
+                                    onCancel={() => {
+                                        setDatePickerOpen(false);
+                                    }}
+                                />
+                            </View>
+                        )}
+                        name={field.name}
+                    />
+                );
+            } else if (field.name === "description") {
+                return (
+                    <Controller
+                        key={field.name}
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextAreaInputField
+                                placeholder={field.placeholder}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                style={styles.inputField}
+                            />
+                        )}
+                        name={field.name}
+                        rules={{ required: field.required || false }}
                     />
                 );
             } else {
@@ -173,34 +275,37 @@ const  OpportunityDetail = ({ route, navigation }) => {
     return (
         <ScrollView style={stylesGlobal.scrollBg}>
             <View style={styles.card}>
-                <Text style={styles.sectionHeader}>opportunity Details</Text>
-                  <View style={{flexDirection:'row',justifyContent:'flex-end'}}>
-                  <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.editButton}>
-                    <Icon name="pencil" color={colors.white} size={22} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.deleteButton}>
-                    <Icon name="trash-outline" color={colors.white} size={22} />
-                </TouchableOpacity>
-                  </View>
+                <Text style={styles.sectionHeader}>Opportunity Details</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                    <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.editButton}>
+                        <Icon name="pencil" color={colors.white} size={22} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => { deleteFunc(opportunity?.id) }} style={styles.deleteButton}>
+                        <Icon name="trash-outline" color={colors.white} size={22} />
+                    </TouchableOpacity>
+                </View>
                 <View style={styles.categoriesContainer}>
                     <View style={styles.row}>
                         <View style={styles.category}>
                             <Text style={styles.categoryHeader}>About</Text>
-                            <Text style={styles.categoryDetail}>Oppoturnity Name: {opportunity.name}</Text>
+                            <Text style={styles.categoryDetail}>Opportunity Name: {opportunity.name}</Text>
                             <Text style={styles.categoryDetail}>Account: {opportunity?.client?.name}</Text>
                             <Text style={styles.categoryDetail}>Close Date: {formatDateToYYYYMMDD(opportunity.close_date)}</Text>
-                            <Text style={styles.categoryDetail}>Amount: {opportunity.amount}</Text>
+                            <Text style={styles.categoryDetail}>Amount: TSH {formatNumber(opportunity.amount, 2)}</Text>
                             <Text style={styles.categoryDetail}>Description: {opportunity.description}</Text>
-                            
                         </View>
+                        
                         <View style={styles.category}>
                             <Text style={styles.categoryHeader}>Status</Text>
-                            <Text style={styles.categoryDetail}>Stage: {opportunity?.opportunity_stages[opportunity?.opportunity_stages?.length-1]?.stage}</Text>
-                            <Text style={styles.categoryDetail}>Probability: {opportunity?.opportunity_stages[opportunity?.opportunity_stages?.length-1]?.probability}</Text>
+                            <Text style={styles.categoryDetail}>Stage: {opportunity?.opportunity_stages[opportunity?.opportunity_stages?.length - 1]?.stage}</Text>
+                            <Text style={styles.categoryDetail}>Probability: {opportunity?.opportunity_stages[opportunity?.opportunity_stages?.length - 1]?.probability}%</Text>
                             <Text style={styles.categoryDetail}>Forecast: {opportunity?.forecast?.name}</Text>
                         </View>
+                    
                     </View>
-            
+                    <View style={{flexDirection:'row',justifyContent:'flex-end'}}>
+                            <Text style={styles.ownerName}> 👤 {opportunity?.owner?.name}</Text>
+                            </View>
                 </View>
             </View>
 
@@ -348,7 +453,7 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 5,
         alignItems: 'center',
-       marginTop: 20,
+        marginTop: 20,
         marginBottom: 20,
     },
     saveButtonText: {
@@ -358,15 +463,15 @@ const styles = StyleSheet.create({
     editButton: {
         backgroundColor: colors.secondary,
         padding: 10,
-        borderRadius:20,
+        borderRadius: 20,
         alignItems: 'center',
         alignSelf: 'flex-end',
-        marginHorizontal:10
+        marginHorizontal: 10
     },
-    deleteButton:{
+    deleteButton: {
         backgroundColor: colors.dangerRed,
         padding: 10,
-        borderRadius:20,
+        borderRadius: 20,
         alignItems: 'center',
         alignSelf: 'flex-end',
     },
@@ -396,7 +501,7 @@ const styles = StyleSheet.create({
     },
     closeButtonText: {
         color: colors.dangerRed,
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
     modalHeader: {
         fontSize: 20,
@@ -409,7 +514,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     modalButtons: {
-    
+
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
@@ -422,6 +527,10 @@ const styles = StyleSheet.create({
         flex: 1,
         margin: 5,
     },
+    ownerName: {
+        fontSize: 14,
+        color: colors.darkGrey,
+    },
     inputField: {
         marginBottom: 15,
     },
@@ -431,4 +540,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default  OpportunityDetail;
+export default OpportunityDetail;
