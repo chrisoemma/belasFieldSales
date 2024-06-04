@@ -19,6 +19,10 @@ import AddClient from "../features/clients/AddClient";
 import ContactPeople from "../features/clients/ContactPeople";
 import LiveLocation from "../features/location/LiveLocation";
 import Leads from "../features/leads/Leads";
+import LeadDetail from "../features/leads/LeadDetail";
+import AddLead from "../features/leads/AddLead";
+import Opportunities from "../features/opportunity/Oppoturnities";
+import OpportunityDetail from "../features/opportunity/OpportunityDetail";
 
 const AppStack = () => {
   const { t } = useTranslation();
@@ -45,6 +49,10 @@ const AppStack = () => {
       <Stack.Screen name="Settings" component={Settings} options={{ title: t('navigate:settings') }} />
       <Stack.Screen name="Live Location" component={LiveLocation} options={{ title: t('navigate:liveLocation') }} />
       <Stack.Screen name="Leads" component={Leads} options={{ title: t('navigate:leads') }} />
+      <Stack.Screen name="LeadDetail" component={LeadDetail}  options={{ title: t('navigate:leadDetail') }} />
+      <Stack.Screen name="OpportunityDetail" component={OpportunityDetail}  options={{ title: t('navigate:opportunityDetail') }} />
+      <Stack.Screen name="AddLead" component={AddLead}  options={{ title: t('navigate:addLead') }} />
+      <Stack.Screen name="Opportunities" component={Opportunities} options={{ title: t('navigate:Opportunities') }} />
     </Stack.Navigator>
   );
 };

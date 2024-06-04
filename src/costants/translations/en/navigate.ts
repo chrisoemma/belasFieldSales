@@ -19,8 +19,10 @@ export default {
     past:'Past',
     liveLocation:'Live Location',
     checkIn:'Check-ins',
-    addContactPerson:'Add contact Person'
-
-   
+    addContactPerson:'Add contact Person',
+    leadDetail:'Lead Detail',
+    addLead:'Add Lead',
+    oppoturnities:'Opportunities',
+    opportunityDetail:'Opportunity Detail'
 
   };

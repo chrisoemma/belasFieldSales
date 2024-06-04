@@ -69,7 +69,7 @@ const CustomDrawerContent = (props: any) => {
       },
       {
         name: 'punchInOut',
-        icon: 'map-pin',
+        icon: 'hand-point-up',
         language:'punchInOut',
         screen: 'punchInOut',
       },
@@ -85,30 +85,30 @@ const CustomDrawerContent = (props: any) => {
         language:'liveTracking',
       },
       {
-        name: 'Clients',
-        icon: 'id-card',
-        language:'clients',
-        screen: 'Clients',
-      },
-      {
         name: 'Tasks',
-        icon: 'cogs',
+        icon: 'assistive-listening-systems',
         language:'tasks',
         screen: 'Tasks',
       },
-
       {
         name: 'Leads',
-        icon: 'cogs',
+        icon: 'newspaper',
         language:'leads',
         screen: 'Leads',
       },
       {
         name: 'Opportunities',
-        icon: 'cogs',
+        icon: 'clipboard-check',
         language:'opportunities',
         screen: 'Opportunities',
       },
+      {
+        name: 'Clients',
+        icon: 'id-card',
+        language:'clients',
+        screen: 'Clients',
+      },
+  
 
       {
         name: 'Settings',

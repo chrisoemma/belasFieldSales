@@ -19,5 +19,9 @@ export default {
     active: "Aktivu",
     past: "Zamani",
     liveLocation: 'Mahali Halisi',
-    addContactPerson:'Ongeza contact person'
+    addContactPerson:'Ongeza contact person',
+    leadDetail:'Maelezo ya mwongozo',
+    addLead:'Ongeza mwongozo',
+    oppoturnities:'Nafasi zenye uwezekano',
+    opportunityDetail:'Maelezo zaidi ya nafasi'
   };

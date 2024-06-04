@@ -192,6 +192,18 @@ export const transformDataToDropdownOptions=(data:any)=> {
 }
 
 
+export const transformDataToDropdownOptionsLead=(data:any)=> {
+  if (!data || !Array.isArray(data)) {
+    return [];
+  }
+
+  return data.map(item => ({
+    label: item.name,
+    value: item.name,
+  }));
+}
+
+
 
 export const getLocationName = async (latitude, longitude) => {
   try {

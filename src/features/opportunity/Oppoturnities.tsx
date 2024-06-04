@@ -7,90 +7,95 @@ import { colors } from '../../utils/colors';
 import FloatButton from '../../components/FloatBtn';
 import { useAppDispatch } from '../../app/store';
 import { useSelector, RootStateOrAny } from 'react-redux';
-import { getLeadStatus, getLeads } from './LeadSlice';
 import Icon from 'react-native-vector-icons/MaterialIcons'; 
 import { formatDateToYYYYMMDD, transformDataToDropdownOptionsLead } from '../../utils/utilts';
+import { getOpportunities, getOpportunityStages } from './OppoturnitySlice';
 
-const Leads = ({ navigation }: any) => {
+const Opportunities = ({ navigation }: any) => {
     const [searchQuery, setSearchQuery] = useState('');
     const dispatch = useAppDispatch();
     const { user } = useSelector((state: RootStateOrAny) => state.user);
-    const { leadStatuses, leads: leadsData } = useSelector((state: RootStateOrAny) => state.leads);
+    const { OpportunityStages, Opportunities } = useSelector((state: RootStateOrAny) => state.Opportunities);
 
     useEffect(() => {
-        dispatch(getLeadStatus({ companyId: user?.company_id }));
-        dispatch(getLeads({ companyId: user?.company_id }));
+        dispatch(getOpportunityStages({ companyId: user?.company_id }));
+        dispatch(getOpportunities({ companyId: user?.company_id }));
     }, [dispatch, user?.company_id]);
 
     const { t } = useTranslation();
     const stylesGlobal = globalStyles();
 
-    const transformedLeadStatuses = transformDataToDropdownOptionsLead(leadStatuses);
-    const [filteredLeads, setFilteredLeads] = useState([]);
+    const transformedOpportunityStages = transformDataToDropdownOptionsLead(OpportunityStages);
+    const [filteredOpportunities, setFilteredOpportunities] = useState([]);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState('all');
-    const [items, setItems] = useState([{ value: 'all', label: 'All' }, ...transformedLeadStatuses]);
+    const [items, setItems] = useState([{ value: 'all', label: 'All' }, ...transformedOpportunityStages]);
 
     useEffect(() => {
-        filterLeads(searchQuery, value);
-    }, [searchQuery, value, leadsData]);
+        filterOpportunities(searchQuery, value);
+    }, [searchQuery, value, Opportunities]);
 
-    const filterLeads = (searchText, status) => {
-        let filteredData = leadsData;
+    const filterOpportunities = (searchText, stage) => {
+        let filteredData = Opportunities;
     
         if (searchText) {
             filteredData = filteredData.filter(item =>
-                item?.client_name?.toLowerCase().includes(searchText.toLowerCase()) ||
-                item?.phone?.includes(searchText) ||
+                item?.client?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+                item?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
                 item?.created_at?.includes(searchText) ||
-                item?.lead_status?.status?.toLowerCase().includes(searchText.toLowerCase())
+                item?.opportunity_stages?.stage?.toLowerCase().includes(searchText.toLowerCase())
             );
         }
     
-        if (status && status !== 'all') {
-            filteredData = filteredData.filter(item => item.lead_status.status === status);
+        if (stage && stage !== 'all') {
+            filteredData = filteredData.filter(item => 
+                item.opportunity_stages.some(stageItem => stageItem.stage === stage)
+            );
         }
     
-        setFilteredLeads(filteredData);
+        setFilteredOpportunities(filteredData);
     };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'New':
-                return colors.successGreen;
-            case 'Contacted':
-                return colors.dangerRed;
-            case 'Nurturing':
+    const getStatusColor = (stage) => {
+        switch (stage) {
+            case 'Qualify':
+                return colors.darkGrey;
+            case 'Meet &  Present':
                 return colors.warningYellow;
-            case 'Qualified':
-                return colors.infoBlue;
-            case 'Unqualified':
-                return colors.grey;
+            case 'Propose':
+                return colors.warningYellow;
+            case 'Negotiate':
+                return colors.lightBlue;
+            case 'Closed won':
+                return colors.successGreen;
+            case 'Closed lost':
+                    return colors.dangerRed;
             default:
                 return colors.darkGrey;
         }
     };
 
-    const renderLeadItem = ({ item }) => (
-        <TouchableOpacity style={styles.leadCard} onPress={() => navigation.navigate('LeadDetail', { lead: item })}>
+    const renderOpportunityItem = ({ item }) => (
+        <TouchableOpacity style={styles.leadCard} onPress={() => navigation.navigate('OpportunityDetail', { opportunity: item })}>
             <View style={styles.leadHeader}>
-                <Text style={styles.company}>{item.client_name}</Text>
+                 <View>
+                 <Text style={[styles.company,{color:colors.justGrey}]}>{item.name}</Text>
+                <Text style={styles.company}>{item.client.name}</Text>
+                 </View>
                 <Text style={styles.createdAt}>{formatDateToYYYYMMDD(item.created_at)}</Text>
             </View>
-            <Text style={styles.detail}>📞 {item?.phone_number}</Text>
-            <Text style={styles.detail}>📇 {item?.first_name} {item?.last_name}</Text>
+            <Text style={styles.detail}>📅 Close Date: {formatDateToYYYYMMDD(item.close_date)}</Text>
+            {/* <Text style={styles.detail}>📊 Forecast: {item.forecast.name}</Text> */}
             <View>
                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                <View style={[styles.statusContainer, { backgroundColor: getStatusColor(item.lead_status.status) }]}>
-                <Text style={styles.statusText}>{item.lead_status.status}</Text>
-               </View>
-                <View style={{flexDirection:'row'}}>
-               
-                    <Text style={styles.ownerName}> 👤 {item.owner.name}</Text>
-                </View>
+                    <View style={[styles.statusContainer, { backgroundColor: getStatusColor(item.opportunity_stages[0]?.stage) }]}>
+                        <Text style={styles.statusText}>{item.opportunity_stages[0]?.stage}</Text>
+                    </View>
+                    <View style={{flexDirection:'row'}}>
+                        <Text style={styles.ownerName}> 👤 {item?.owner?.name}</Text>
+                    </View>
                 </View>
             </View>
-          
         </TouchableOpacity>
     );
 
@@ -108,7 +113,7 @@ const Leads = ({ navigation }: any) => {
                             setOpen={setOpen}
                             setValue={setValue}
                             setItems={setItems}
-                            placeholder="Select status"
+                            placeholder="Select stage"
                             containerStyle={{
                                 marginLeft: 15,
                             }}
@@ -116,7 +121,7 @@ const Leads = ({ navigation }: any) => {
                     </View>
                     <View style={[stylesGlobal.searchContainer, { width: '53%' }]}>
                         <TextInput
-                            placeholder="Search leads"
+                            placeholder="Search Opportunities"
                             style={[stylesGlobal.input, { height: 50, marginVertical: 0 }]}
                             value={searchQuery}
                             onChangeText={(text) => {
@@ -126,8 +131,8 @@ const Leads = ({ navigation }: any) => {
                     </View>
                 </View>
                 <FlatList
-                    data={filteredLeads}
-                    renderItem={renderLeadItem}
+                    data={filteredOpportunities}
+                    renderItem={renderOpportunityItem}
                     keyExtractor={item => item.id.toString()}
                     contentContainerStyle={styles.leadList}
                 />
@@ -161,26 +166,21 @@ const styles = StyleSheet.create({
     },
     createdAt: {
         fontSize: 14,
-        color: colors.grey,
+        color: colors.darkGrey,
     },
     detail: {
-        fontSize: 16,
+        fontSize: 14,
         color: colors.darkGrey,
-        marginBottom: 3,
+        marginBottom: 5,
     },
     statusContainer: {
-        alignSelf: 'flex-start',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        marginTop: 5,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 12,
     },
     statusText: {
-        fontSize: 14,
         color: colors.white,
-    },
-    leadList: {
-        paddingBottom: 20,
+        fontWeight: 'bold',
     },
     ownerName: {
         fontSize: 14,
@@ -188,4 +188,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Leads;
+export default Opportunities;

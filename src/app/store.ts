@@ -25,22 +25,29 @@ import checkInSlice from '../features/checkInsOut/checkInSlice';
 import InternetSlice from '../features/InternetSlice';
 import PunchRecordSlice from '../features/punchInOut/PunchRecordSlice';
 import ContactPeopleSlice from '../features/contacts/ContactPeopleSlice';
+import LeadSlice from '../features/leads/LeadSlice';
+import Opportunities from '../features/opportunity/Oppoturnities';
+import OppoturnitySlice from '../features/opportunity/OppoturnitySlice';
+import forecastCategorySlice from '../features/forecastCategory/forecastCategorySlice';
 
 
 const reducers = combineReducers({
   user: userReducer,
-  language:languageSlice,
-  industriesPositions:IndustryPositionSlice,
-  tasks:TaskSlice,
-  salesPeople:SalesPeopleSlice,
-  clients:ClientSlice,
-  theme:ThemeSlice,
+  language: languageSlice,
+  industriesPositions: IndustryPositionSlice,
+  tasks: TaskSlice,
+  salesPeople: SalesPeopleSlice,
+  clients: ClientSlice,
+  theme: ThemeSlice,
   tracking: trackingSlice,
-  onboarding:OnboardingSlice,
-  checkIns:checkInSlice,
-  internet:InternetSlice,
-  PunchRecords:PunchRecordSlice,
-  contactPeople:ContactPeopleSlice
+  onboarding: OnboardingSlice,
+  checkIns: checkInSlice,
+  internet: InternetSlice,
+  PunchRecords: PunchRecordSlice,
+  contactPeople: ContactPeopleSlice,
+  leads: LeadSlice,
+  Opportunities: OppoturnitySlice,
+  forecastCategories: forecastCategorySlice
 
 });
 
