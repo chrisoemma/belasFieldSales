@@ -22,7 +22,6 @@ function updateStatus(state: any, status: any) {
     state.status = '';
     return;
   }
-
   if (status.error) {
     state.status = status.error;
     return;
@@ -31,7 +30,6 @@ function updateStatus(state: any, status: any) {
   state.status = 'Request failed. Please try again.';
   return;
 }
-
 
 export const createClient = createAsyncThunk(
   'clients/createClient',

@@ -139,6 +139,39 @@ export default {
   deleteOpportunity:'Delete Opportunity',
   addAccount:'Add Account',
   account:'Account',
-  selectAccount:'Select Account'
+  selectAccount:'Select Account',
+  pleaseChooseAccount:'Please Choose account',
+   pleaseChooseCloseDate:'Please choose close Date',
+   oppoturnityNameRequired:'Please fill oppoturnity name',
+   save:'Save',
+
+   opportunityUpdatedSucessfully:'Opportunity Updated Successfully',
+   failedToUpdateOpportunity:'Failed to update opportunity',
+   pleaseSelectOpportubityWonLost:'Please select whether the opportunity is Won or Lost',
+   opportunityStageUpdated:'Opportunity stage updated',
+   failedUpdateOpportunityStage:'Failed to update opportunity stage',
+   about:'About',
+   status:'Status',
+   forecastCategory:'Forecast Category',
+   opportunityName:'Opportunity Name',
+   enterOpportunityName:'Enter Opportunity name',
+   close_date:"Close Date",
+   addNewAccount:'Add new account',
+   OpportunityDetail:'Opportunity Details',
+   markStageAsComplete:'Mark Stage as Complete',
+   next:'Next',
+   isClosedAsWonLost:'Is the opportunity Closed as Won or Lost?',
+   won:'Won',
+   lost:'Lost',
+   searchOpportunities:'Search Opportunities',
+   selectStage:'Select Stage',
+   amount:'Amount',
+   stage:'Stage',
+   noChangesDetected:'No changes detected',
+   selectForecastCategory:'Select Forecast Category'
+
+  
+   
+   
   
 };

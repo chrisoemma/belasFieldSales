@@ -5,14 +5,20 @@ import { useForm, Controller } from 'react-hook-form';
 import { TextInputField } from '../../components/TextInputField';
 import { colors } from '../../utils/colors';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { addLead } from './LeadSlice';
-import { transformDataToDropdownOptions } from '../../utils/utilts';
+import { addLead, getLeadStatus } from './LeadSlice';
+import { transformDataToDropdownOptions, transformDataToDropdownOptionsLead } from '../../utils/utilts';
+import { useTranslation } from 'react-i18next';
+import { globalStyles } from '../../styles/global';
+import { TextAreaInputField } from '../../components/TextAreaInputField';
 
-const AddLead = ({ navigation }) => {
+const AddLead = ({ navigation }:any) => {
     const dispatch = useDispatch();
-    const { control, handleSubmit } = useForm();
+    const { t } = useTranslation();
+    const stylesGlobal = globalStyles();
+
+    const { user } = useSelector((state) => state.user);
     const { loading: positionLoading, positions, industries } = useSelector(state => state.industriesPositions);
-    
+    const { leadStatuses, leads: leadsData } = useSelector((state: RootStateOrAny) => state.leads);
     const [leadSourceOpen, setLeadSourceOpen] = useState(false);
     const [leadSourceValue, setLeadSourceValue] = useState(null);
     const [leadSourceItems, setLeadSourceItems] = useState([
@@ -21,14 +27,47 @@ const AddLead = ({ navigation }) => {
         // Add more lead sources here
     ]);
 
+
+    const {
+        control: control,
+        handleSubmit: handleSubmit,
+        formState: { errors },
+    } = useForm({
+        defaultValues: {
+            first_name: '',
+            last_name: '',
+            company_name: '',
+            title: '',
+            website:'',
+            descrption:'',
+            phone_number:'',
+            email:'',
+            lead_status:''
+
+        },
+    });
+
     const [industryOpen, setIndustryOpen] = useState(false);
     const [industryValue, setIndustryValue] = useState(null);
     const [industryItems, setIndustryItems] = useState([]);
+    const [leadStatusOpen, setLeadStatusOpen] = useState(false);
+    const [leadStatusValue, setLeadStatusValue] = useState(null);
+    const [leadStatusItems, setLeadStatusItems] = useState([]);
 
     useEffect(() => {
   
         setIndustryItems(transformDataToDropdownOptions(industries));
     }, []);
+
+    useEffect(() => {
+        dispatch(getLeadStatus({ companyId: user?.company_id }));
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (leadStatuses) {
+            setLeadStatusItems(transformDataToDropdownOptionsLead(leadStatuses));
+        }
+    }, [leadStatuses]);
 
     const onSubmit = (data) => {
         dispatch(addLead(data));
@@ -53,7 +92,7 @@ const AddLead = ({ navigation }) => {
                         />
                     )}
                     name="first_name"
-                    rules={{ required: true }}
+                   
                 />
                 <Controller
                     control={control}
@@ -70,6 +109,11 @@ const AddLead = ({ navigation }) => {
                     name="last_name"
                     rules={{ required: true }}
                 />
+                   {errors.last_name && (
+                                <Text style={stylesGlobal.errorMessage}>
+                                    {t('screens:lastNameRequired')}
+                                </Text>
+                            )}
                 <Controller
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
@@ -82,10 +126,64 @@ const AddLead = ({ navigation }) => {
                             style={styles.inputField}
                         />
                     )}
-                    name="client_name"
+                    name="company_name"
                     rules={{ required: true }}
                 />
-                {/* Add similar Controller components for other fields in the "About" section */}
+                    {errors.company_name && (
+                                <Text style={stylesGlobal.errorMessage}>
+                                    {t('screens:companyNameRequired')}
+                                </Text>
+                            )}
+
+                          <Controller
+                    control={control}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInputField
+                            label={t('screens:title')}
+                            placeholder={t('screens:title')}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            style={styles.inputField}
+                        />
+                    )}
+                    name="title"
+                
+                />
+                    <Controller
+                                control={control}
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <TextAreaInputField
+                                        placeholder={t('screens:description')}
+                                        onBlur={onBlur}
+                                        onChangeText={onChange}
+                                        value={value}
+                                        style={styles.inputField}
+                                    />
+                                )}
+                                name="decription"
+                                rules={{ required: false }}
+                            />
+
+                            <Controller
+                                control={control}
+                                render={({ field: { onChange, value } }) => (
+                                    <DropDownPicker
+                                        open={leadStatusOpen}
+                                        value={leadStatusValue}
+                                        items={leadStatusItems}
+                                        listMode="SCROLLVIEW"
+                                        zIndex={7000}
+                                        setOpen={setLeadStatusOpen}
+                                        setValue={setLeadStatusValue}
+                                        setItems={setLeadStatusItems}
+                                        placeholder={t('screens:selectStatus')}
+                                        onChangeValue={onChange}
+                                        style={styles.inputField}
+                                    />
+                                )}
+                                name="lead_status"
+                            />
             </View>
 
             <View style={styles.card}>
@@ -104,7 +202,7 @@ const AddLead = ({ navigation }) => {
                         />
                     )}
                     name="phone_number"
-                    rules={{ required: true }}
+                 
                 />
                 <Controller
                     control={control}
@@ -122,7 +220,33 @@ const AddLead = ({ navigation }) => {
                     name="email"
                     rules={{ required: true }}
                 />
-                {/* Add similar Controller components for other fields in the "Get in touch" section */}
+
+            <Controller
+                control={control}
+                rules={{
+                    required: 'Website URL is required',
+                    pattern: {
+                        value: /^(https?|chrome):\/\/[^\s$.?#].[^\s]*$/,
+                        message: 'Enter a valid website URL',
+                    }
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                    <View>
+                        <TextInputField
+                            placeholder='Website'
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            keyboardType='url'
+                            style={[styles.inputField]}
+                        />
+                        {errors.website && <Text style={stylesGlobal.errorMessage}>{t('screens:enterValidUrlStartHttp')}</Text>}
+                    </View>
+                )}
+                name="website"
+            />
+
+                   
             </View>
 
             <View style={styles.card}>

@@ -1,13 +1,13 @@
-import React, { useState, useEffect,useRef,useMemo,useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ToastAndroid } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm, Controller } from 'react-hook-form';
 import { TextInputField } from '../../components/TextInputField';
 import { colors } from '../../utils/colors';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { formatDateToYYYYMMDDHHMM, transformDataToDropdownOptions, transformDataToDropdownOptionsClients } from '../../utils/utilts';
+import { formatDateToYYYYMMDDHHMM, transformDataToDropdownOptions, transformDataToDropdownOptionsClients, transformDataToDropdownOptionsLead } from '../../utils/utilts';
 import { globalStyles } from '../../styles/global';
-import { getOpportunityStages } from './OppoturnitySlice';
+import { addOpportunity, getOpportunityStages } from './OppoturnitySlice';
 import { getForecastCategories } from '../forecastCategory/forecastCategorySlice';
 import { useTranslation } from 'react-i18next';
 import { TextAreaInputField } from '../../components/TextAreaInputField';
@@ -25,8 +25,8 @@ import { createClient, getClients } from '../clients/ClientSlice';
 
 const AddOpportunity = ({ navigation }: any) => {
 
-
     const stylesGlobal = globalStyles();
+    const { t } = useTranslation();
 
     const {
         control: control2,
@@ -40,34 +40,63 @@ const AddOpportunity = ({ navigation }: any) => {
         },
     });
 
-
     const {
         control: control,
         handleSubmit: handleSubmit,
         formState: { errors },
-      } = useForm({
+    } = useForm({
         defaultValues: {
-          name: '',
-          amount: '',
-          probability: ''
+            opportunity_name: '',
+            amount: '',
+            probability: '',
+            forecast: ''
         },
-      });
+    });
 
     const dispatch = useDispatch();
-   
+
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const [sheetTitle, setSheetTitle] = useState('');
 
     const [clientOpen, setClientOpen] = useState(false);
     const [clientValue, setClientValue] = useState(null);
-    const { OpportunityStages } = useSelector((state) => state.Opportunities);
+    const { OpportunityStages, loading } = useSelector((state) => state.Opportunities);
     const { forecastCategories } = useSelector((state) => state.forecastCategories);
     const { user } = useSelector((state) => state.user);
+    const [forecastCategoryOpen, setForecastCategoryOpen] = useState(false);
+    const [forecastCategoryValue, setForecastCategoryValue] = useState(null);
+    const [forecastCategoryItems, setForecastCategoryItems] = useState([]);
+
+    const [oppoturnityStageOpen, setOppoturnityStageOpen] = useState(false);
+    const [oppoturnityStageValue, setOppoturnityStageValue] = useState(null);
+    const [oppoturnityStageItems, setOppoturnityStageItems] = useState([]);
+    const [message, setMessage] = useState('');
+
+    const [datePickerOpen, setDatePickerOpen] = useState(false);
+    const [closeDateError, setCloseDateError] = useState('')
+
+    const snapPoints = useMemo(() => ['25%', '70%'], []);
+
+    const setDisappearMessage = (message: any) => {
+        setMessage(message);
+
+        setTimeout(() => {
+            setMessage('');
+        }, 5000);
+    };
+
+
+    // callbacks
+    const handlePresentModalPress = useCallback(() => {
+        bottomSheetModalRef.current?.present();
+    }, []);
+    const handleSheetChanges = useCallback((index: number) => {
+        console.log('handleSheetChanges', index);
+    }, []);
     const { loading: clientLoading, clients } = useSelector(
         (state: RootStateOrAny) => state.clients,
     );
     const [itemValueError, setItemValueError] = useState(null);
-
 
     useEffect(() => {
         dispatch(getOpportunityStages({ companyId: user?.company_id }));
@@ -79,7 +108,7 @@ const AddOpportunity = ({ navigation }: any) => {
 
     useEffect(() => {
         if (OpportunityStages) {
-            setOppoturnityStageItems(transformDataToDropdownOptions(OpportunityStages));
+            setOppoturnityStageItems(transformDataToDropdownOptionsLead(OpportunityStages));
         }
     }, [OpportunityStages]);
 
@@ -89,25 +118,58 @@ const AddOpportunity = ({ navigation }: any) => {
         }
     }, [forecastCategories]);
 
-
     useEffect(() => {
         dispatch(getClients({ companyId: user?.company_id }));
-    }, [])
-
-
-    const { t } = useTranslation();
+    }, []);
 
     const handleStatusChange = (newStatus) => {
         setStatus(newStatus);
-        // dispatch(updateOpportunityStatus({ opportunityId: opportunity.id, status: newStatus }));
     };
 
     const onSubmit = (data) => {
 
-          console.log('dataaa test',data)
-          return 
-        ToastAndroid.show('Opportunity details updated successfully', ToastAndroid.SHORT);
-        navigation.goBack();
+        data.creator = user?.id;
+        data.company_id = user?.company_id;
+        data.client = clientValue;
+
+        if (clientValue == null) {
+            setItemValueError(t('screens:pleaseChooseAccount'));
+        } else {
+            if (itemValueError) {
+                setItemValueError('');
+            }
+        }
+
+        if (data?.close_date == null) {
+            setCloseDateError(t('screens:pleaseChooseCloseDate'));
+        } else {
+            if (closeDateError) {
+                setCloseDateError('');
+            }
+        }
+
+
+        dispatch(addOpportunity({ data: data }))
+            .unwrap()
+            .then(result => {
+                if (result.status) {
+
+                    ToastAndroid.show(`${t('screens:createdSuccessfully')}`, ToastAndroid.SHORT);
+                    navigation.navigate('Opportunities', {
+                        screen: 'Opportunities',
+                    });
+                } else {
+                    setDisappearMessage(
+                        `${t('screens:requestFail')}`,
+                    );
+                    console.log('dont navigate');
+                }
+            })
+            .catch(rejectedValueOrSerializedError => {
+                // handle error here
+                console.log('error');
+                console.log(rejectedValueOrSerializedError);
+            });
     };
 
     const onSubmit2 = (data) => {
@@ -131,60 +193,42 @@ const AddOpportunity = ({ navigation }: any) => {
             });
     }
 
-
-
     const handleMarkComplete = () => {
         handleStatusChange('Complete');
     };
 
-
-
-    const [forecastCategoryOpen, setForecastCategoryOpen] = useState(false);
-    const [forecastCategoryValue, setForecastCategoryValue] = useState(null);
-    const [forecastCategoryItems, setForecastCategoryItems] = useState([]);
-
-    const [oppoturnityStageOpen, setOppoturnityStageOpen] = useState(false);
-    const [oppoturnityStageValue, setOppoturnityStageValue] = useState(null);
-    const [oppoturnityStageItems, setOppoturnityStageItems] = useState([]);
-
-    const [datePickerOpen, setDatePickerOpen] = useState(false);
-
-
-    const snapPoints = useMemo(() => ['25%', '70%'], []);
-
-    // callbacks
-    const handlePresentModalPress = useCallback(() => {
-
-        bottomSheetModalRef.current?.present();
-    }, []);
-    const handleSheetChanges = useCallback((index: number) => {
-        console.log('handleSheetChanges', index);
-    }, [])
-
     return (
         <>
             <GestureHandlerRootView>
-            <ScrollView
-          style={[stylesGlobal.scrollBg,{backgroundColor:colors.white}]}
-        >
-          <View>
+                <ScrollView
+                    style={[stylesGlobal.scrollBg, { backgroundColor: colors.white }]}
+                >
+                    <View>
                         <View style={styles.card}>
-                            <Text style={styles.sectionHeader}>About</Text>
+                            <BasicView style={stylesGlobal.centerView}>
+                                <Text style={stylesGlobal.errorMessage}>{message}</Text>
+                            </BasicView>
+                            <Text style={styles.sectionHeader}>{t('screens:about')}</Text>
                             <Controller
                                 control={control}
                                 render={({ field: { onChange, onBlur, value } }) => (
                                     <TextInputField
-                                        label="name"
-                                        placeholder="Enter name"
+                                        label={t('screens:opportunityName')}
+                                        placeholder={t('screens:opportunityName')}
                                         onBlur={onBlur}
                                         onChangeText={onChange}
                                         value={value}
                                         style={styles.inputField}
                                     />
                                 )}
-                                name="name"
+                                name="opportunity_name"
                                 rules={{ required: true }}
                             />
+                            {errors.name && (
+                                <Text style={stylesGlobal.errorMessage}>
+                                    {t('screens:oppoturnityNameRequired')}
+                                </Text>
+                            )}
                             <BasicView>
                                 <View style={{
                                     marginVertical: 20
@@ -208,27 +252,25 @@ const AddOpportunity = ({ navigation }: any) => {
                                 </View>
                                 <TouchableOpacity
                                     onPress={handlePresentModalPress}
-                                    style={{ marginLeft: 10, marginBottom:10}}
+                                    style={{ marginLeft: 10, marginBottom: 10 }}
                                 >
                                     <Text style={{
                                         color: colors.secondary,
                                         fontWeight: 'bold',
                                         fontSize: 16,
-                                        
+
                                     }}>{t('screens:addAccount')}</Text>
                                 </TouchableOpacity>
-
                             </BasicView>
 
                             <Controller
-
                                 control={control}
                                 render={({ field: { onChange, value } }) => (
                                     <View>
                                         <TouchableOpacity onPress={() => setDatePickerOpen(true)}>
                                             <TextInputField
-                                                label="Close Date"
-                                                placeholder="Close Date"
+                                                label={t('screens:close_date')}
+                                                placeholder={t('screens:close_date')}
                                                 value={formatDateToYYYYMMDDHHMM(value)}
                                                 editable={false}
                                                 style={styles.inputField}
@@ -255,14 +297,15 @@ const AddOpportunity = ({ navigation }: any) => {
                                 name="close_date"
                             />
 
-
+                            {closeDateError ? (<Text style={{
+                                color: colors.dangerRed
+                            }}>{closeDateError}</Text>) : (<></>)}
 
                             <Controller
-
                                 control={control}
                                 render={({ field: { onChange, onBlur, value } }) => (
                                     <TextAreaInputField
-                                        placeholder="Description"
+                                        placeholder={t('screens:description')}
                                         onBlur={onBlur}
                                         onChangeText={onChange}
                                         value={value}
@@ -277,22 +320,22 @@ const AddOpportunity = ({ navigation }: any) => {
                                 control={control}
                                 render={({ field: { onChange, onBlur, value } }) => (
                                     <TextInputField
-                                        label="Amount"
-                                        placeholder="Enter Amount"
+                                        label={t('screens:amount')}
+                                        placeholder={t('screens:amount')}
                                         onBlur={onBlur}
                                         onChangeText={onChange}
                                         value={value}
+                                        keyboardType='numeric'
                                         style={styles.inputField}
                                     />
                                 )}
                                 name="amount"
                                 rules={{ required: false }}
                             />
-
                         </View>
 
                         <View style={styles.card}>
-                            <Text style={styles.sectionHeader}>Status</Text>
+                            <Text style={styles.sectionHeader}>{t('screens:status')}</Text>
                             <Controller
                                 control={control}
                                 render={({ field: { onChange, value } }) => (
@@ -305,12 +348,12 @@ const AddOpportunity = ({ navigation }: any) => {
                                         setOpen={setOppoturnityStageOpen}
                                         setValue={setOppoturnityStageValue}
                                         setItems={setOppoturnityStageItems}
-                                        placeholder="Select opportunity stage"
+                                        placeholder={t('screens:selectStage')}
                                         onChangeValue={onChange}
                                         style={styles.inputField}
                                     />
                                 )}
-                                name="opportunity_stage"
+                                name="stage"
                             />
                             <Controller
                                 control={control}
@@ -324,39 +367,49 @@ const AddOpportunity = ({ navigation }: any) => {
                                         setOpen={setForecastCategoryOpen}
                                         setValue={setForecastCategoryValue}
                                         setItems={setForecastCategoryItems}
-                                        placeholder="Select forecast category"
+                                        placeholder={t('screens:selectForecastCategory')}
                                         onChangeValue={onChange}
                                         style={styles.inputField}
                                     />
                                 )}
-                                name="forecast_category"
+                                name="forecast"
                             />
 
                             <Controller
                                 control={control}
                                 render={({ field: { onChange, onBlur, value } }) => (
-                                    <TextInputField
-                                        label="Probability"
-                                        placeholder="Enter Probability"
-                                        onBlur={onBlur}
-                                        onChangeText={onChange}
-                                        value={value}
-                                        keyboardType='phone-pad'
-                                        style={styles.inputField}
-                                    />
+                                    <View>
+                                        <TextInputField
+                                            label={t('screens:probability')}
+                                            placeholder={t('screens:probability')}
+                                            onBlur={onBlur}
+                                            onChangeText={(text) => {
+                                                const num = parseFloat(text);
+                                                if (num >= 0 && num <= 100 || text === '') {
+                                                    onChange(text);
+                                                }
+                                            }}
+                                            value={value}
+                                            keyboardType='numeric'
+                                            style={styles.inputField}
+                                        />
+                                        {errors.probability && (
+                                            <Text style={stylesGlobal.errorMessage}>
+                                                {t('screens:probabilityRange')}
+                                            </Text>
+                                        )}
+                                    </View>
                                 )}
                                 name="probability"
-                                rules={{ required: false }}
+                                rules={{
+                                    validate: value => !value || (value >= 0 && value <= 100) || t('screens:probabilityRange')
+                                }}
                             />
-
                         </View>
 
-
-
-
-                        <TouchableOpacity style={styles.saveButton} onPress={handleSubmit(onSubmit)}>
-                            <Text style={styles.saveButtonText}>Save</Text>
-                        </TouchableOpacity>
+                        <Button loading={loading} onPress={handleSubmit(onSubmit)}>
+                            <ButtonText>  {t('screens:save')}</ButtonText>
+                        </Button>
 
 
                     </View>
@@ -440,7 +493,6 @@ const AddOpportunity = ({ navigation }: any) => {
                                         )}
                                     </BasicView>
 
-
                                     <BasicView>
                                         <Text
                                             style={[
@@ -471,7 +523,6 @@ const AddOpportunity = ({ navigation }: any) => {
                                         )}
                                     </BasicView>
 
-
                                 </BasicView>
 
                                 <BasicView>
@@ -479,7 +530,6 @@ const AddOpportunity = ({ navigation }: any) => {
                                         <ButtonText>  {t('screens:addAccount')}</ButtonText>
                                     </Button>
                                 </BasicView>
-
                             </BottomSheetScrollView>
                         </BottomSheetModal>
                     </View>
@@ -499,7 +549,6 @@ const styles = StyleSheet.create({
         padding: 20,
         margin: 10,
         borderRadius: 10,
-
     },
     sectionHeader: {
         fontSize: 18,
@@ -520,6 +569,7 @@ const styles = StyleSheet.create({
     },
     inputField: {
         marginBottom: 15,
+        fontWeight: 'bold'
     },
     buttonAttach: {
         justifyContent: 'space-between',

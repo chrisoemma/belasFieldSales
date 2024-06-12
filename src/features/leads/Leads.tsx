@@ -31,6 +31,8 @@ const Leads = ({ navigation }: any) => {
     const [value, setValue] = useState('all');
     const [items, setItems] = useState([{ value: 'all', label: 'All' }, ...transformedLeadStatuses]);
 
+   
+
     useEffect(() => {
         filterLeads(searchQuery, value);
     }, [searchQuery, value, leadsData]);

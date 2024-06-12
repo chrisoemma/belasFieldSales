@@ -1,6 +1,7 @@
 import { Linking } from 'react-native';
 import { GOOGLE_MAPS_API_KEY } from './config';
 import moment from 'moment'; 
+import { colors } from './colors';
 
 export const currencyFormatter: any = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -107,6 +108,28 @@ export const dbDateFormat = (d) => {
   return year + "-" + month + "-" + dt;
 };
 
+
+export const getStatusColor = (level, status, isLastStage) => {
+  if (isLastStage) {
+      if (status === 'Won') return colors.successGreen;
+      if (status === 'Lost') return colors.dangerRed;
+  }
+
+  // Assign colors based on the level if not the last stage
+  switch (level) {
+      case 1: // Qualify
+          return colors.darkGrey;
+      case 2: // Meet & Present
+          return colors.warningYellow;
+      case 3: // Propose
+          return colors.warningYellow;
+      case 4: // Negotiate
+          return colors.lightBlue;
+      // Add more cases as needed for additional levels
+      default:
+          return colors.darkGrey;
+  }
+};
 
 export const transformDataToDropdownOptionsClients=(data:any)=> {
   if (!data || !Array.isArray(data)) {

@@ -7,8 +7,7 @@ import { colors } from '../../utils/colors';
 import FloatButton from '../../components/FloatBtn';
 import { useAppDispatch } from '../../app/store';
 import { useSelector, RootStateOrAny } from 'react-redux';
-import Icon from 'react-native-vector-icons/MaterialIcons'; 
-import { formatDateToYYYYMMDD, transformDataToDropdownOptionsLead } from '../../utils/utilts';
+import { formatDateToYYYYMMDD, getStatusColor, transformDataToDropdownOptionsLead } from '../../utils/utilts';
 import { getOpportunities, getOpportunityStages } from './OppoturnitySlice';
 
 const Opportunities = ({ navigation }: any) => {
@@ -56,48 +55,46 @@ const Opportunities = ({ navigation }: any) => {
         setFilteredOpportunities(filteredData);
     };
 
-    const getStatusColor = (stage) => {
-        switch (stage) {
-            case 'Qualify':
-                return colors.darkGrey;
-            case 'Meet &  Present':
-                return colors.warningYellow;
-            case 'Propose':
-                return colors.warningYellow;
-            case 'Negotiate':
-                return colors.lightBlue;
-            case 'Closed won':
-                return colors.successGreen;
-            case 'Closed lost':
-                    return colors.dangerRed;
-            default:
-                return colors.darkGrey;
-        }
-    };
 
-    const renderOpportunityItem = ({ item }) => (
-        <TouchableOpacity style={styles.leadCard} onPress={() => navigation.navigate('OpportunityDetail', { opportunity: item })}>
-            <View style={styles.leadHeader}>
-                 <View>
-                 <Text style={[styles.company,{color:colors.justGrey}]}>{item.name}</Text>
-                <Text style={styles.company}>{item.client.name}</Text>
-                 </View>
-                <Text style={styles.createdAt}>{formatDateToYYYYMMDD(item.created_at)}</Text>
-            </View>
-            <Text style={styles.detail}>📅 Close Date: {formatDateToYYYYMMDD(item.close_date)}</Text>
-            {/* <Text style={styles.detail}>📊 Forecast: {item.forecast.name}</Text> */}
-            <View>
-                <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                    <View style={[styles.statusContainer, { backgroundColor: getStatusColor(item?.opportunity_stages[item?.opportunity_stages?.length - 1]?.stage) }]}>
-                        <Text style={styles.statusText}>{item?.opportunity_stages[item?.opportunity_stages?.length - 1]?.stage}</Text>
+
+    const renderOpportunityItem = ({ item }) => {
+      
+        const latestStage = item.opportunity_stages.reduce((prev, curr) => {
+            return (prev.level > curr.level) ? prev : curr;
+        }, {});
+
+        const latestStageLevel = OpportunityStages.find(stage => stage.name === latestStage.stage)?.level || 0;
+
+        const maxLevel = Math.max(...OpportunityStages.map(stage => stage.level));
+        const isLastStage = latestStageLevel === maxLevel;
+        const stageLabel = isLastStage ? `${latestStage.stage} - ${latestStage.status}` : latestStage.stage;
+    
+        return (
+            <TouchableOpacity style={styles.leadCard} onPress={() => navigation.navigate('OpportunityDetail', { opportunity: item })}>
+                <View style={styles.leadHeader}>
+                    <View>
+                        <Text style={[styles.company, { color: colors.justGrey }]}>{item.name}</Text>
+                        <Text style={styles.company}>{item.client.name}</Text>
                     </View>
-                    <View style={{flexDirection:'row'}}>
-                        <Text style={styles.ownerName}> 👤 {item?.owner?.name}</Text>
+                    <Text style={styles.createdAt}>{formatDateToYYYYMMDD(item.created_at)}</Text>
+                </View>
+                <Text style={styles.detail}>📅 {t('screens:close_date')}: {formatDateToYYYYMMDD(item.close_date)}</Text>
+                <View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <View style={[styles.statusContainer, { backgroundColor: getStatusColor(latestStageLevel, latestStage.status, isLastStage) }]}>
+                            <Text style={styles.statusText}>{stageLabel}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.ownerName}>👤 {item?.owner?.name}</Text>
+                        </View>
                     </View>
                 </View>
-            </View>
-        </TouchableOpacity>
-    );
+            </TouchableOpacity>
+        );
+    };
+    
+    
+
 
     return (
         <View style={[stylesGlobal.scrollBg, { flex: 1 }]}>
@@ -113,7 +110,7 @@ const Opportunities = ({ navigation }: any) => {
                             setOpen={setOpen}
                             setValue={setValue}
                             setItems={setItems}
-                            placeholder="Select stage"
+                            placeholder={t('screens:selectStage')}
                             containerStyle={{
                                 marginLeft: 15,
                             }}
@@ -121,7 +118,7 @@ const Opportunities = ({ navigation }: any) => {
                     </View>
                     <View style={[stylesGlobal.searchContainer, { width: '53%' }]}>
                         <TextInput
-                            placeholder="Search Opportunities"
+                            placeholder={t('screens:searchOpportunities')}
                             style={[stylesGlobal.input, { height: 50, marginVertical: 0 }]}
                             value={searchQuery}
                             onChangeText={(text) => {
@@ -133,7 +130,7 @@ const Opportunities = ({ navigation }: any) => {
                 <FlatList
                     data={filteredOpportunities}
                     renderItem={renderOpportunityItem}
-                    keyExtractor={item => item.id.toString()}
+                    keyExtractor={item => item?.id?.toString()}
                     contentContainerStyle={styles.leadList}
                 />
             </View>
